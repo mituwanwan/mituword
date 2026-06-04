@@ -39,6 +39,8 @@ lerna-debug.log*
 # Prisma
 prisma/migrations/
 *.db
+my-app/prisma/dev.db
+my-app/prisma/prisma/
 
 # Temporary files
 *.tmp
