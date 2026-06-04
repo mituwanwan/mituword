@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.gitignore
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+prisma/dev.db
+prisma/test.db
+prisma/migrations_backup

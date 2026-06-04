@@ -1,0 +1,313 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "linux-musl"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String
+  password      String?
+  image         String?
+  role          String    @default("ADMIN")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  profile       Profile?
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Profile {
+  id          String           @id @default(uuid())
+  userId      String           @unique
+  fullName    String
+  title       String
+  bio         String
+  avatar      String?
+  location    String?
+  phone       String?
+  email       String?
+  website     String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  education   Education[]
+  experience  WorkExperience[]
+  skills      Skill[]
+  socialLinks SocialLink[]
+}
+
+model Education {
+  id          String   @id @default(uuid())
+  profileId   String
+  school      String
+  major       String
+  degree      String
+  startDate   DateTime
+  endDate     DateTime?
+  description String?
+  order       Int      @default(0)
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model WorkExperience {
+  id          String   @id @default(uuid())
+  profileId   String
+  company     String
+  position    String
+  startDate   DateTime
+  endDate     DateTime?
+  isCurrent   Boolean  @default(false)
+  description String?
+  order       Int      @default(0)
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Skill {
+  id          String  @id @default(uuid())
+  profileId   String
+  name        String
+  category    String
+  proficiency Int
+  icon        String?
+  order       Int     @default(0)
+  profile     Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model SocialLink {
+  id        String  @id @default(uuid())
+  profileId String
+  platform  String
+  url       String
+  icon      String?
+  order     Int     @default(0)
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Project {
+  id          String           @id @default(uuid())
+  title       String
+  slug        String           @unique
+  description String
+  categoryId  String?
+  demoUrl     String?
+  repoUrl     String?
+  startDate   DateTime?
+  endDate     DateTime?
+  status      String           @default("COMPLETED")
+  featured    Boolean          @default(false)
+  thumbnail   String?
+  views       Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  category    ProjectCategory? @relation(fields: [categoryId], references: [id])
+  tags        ProjectTagRelation[]
+  images      ProjectImage[]
+}
+
+model ProjectCategory {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  color       String?
+  order       Int       @default(0)
+  projects    Project[]
+}
+
+model ProjectTag {
+  id       String               @id @default(uuid())
+  name     String               @unique
+  color    String?
+  projects ProjectTagRelation[]
+}
+
+model ProjectTagRelation {
+  id        String     @id @default(uuid())
+  projectId String
+  tagId     String
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tag       ProjectTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, tagId])
+}
+
+model ProjectImage {
+  id        String  @id @default(uuid())
+  projectId String
+  url       String
+  alt       String?
+  order     Int     @default(0)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model GitHubRepo {
+  id          String   @id @default(uuid())
+  repoId      Int      @unique
+  name        String
+  fullName    String
+  description String?
+  htmlUrl     String
+  stars       Int      @default(0)
+  forks       Int      @default(0)
+  watchers    Int      @default(0)
+  language    String?
+  languages   String?
+  topics      String?
+  createdAt   DateTime
+  updatedAt   DateTime
+  pushedAt    DateTime?
+  syncAt      DateTime @default(now())
+}
+
+model GitHubSyncLog {
+  id         String   @id @default(uuid())
+  syncTime   DateTime @default(now())
+  status     String
+  reposCount Int      @default(0)
+  errorMsg   String?
+}
+
+model MusicTrack {
+  id          String          @id @default(uuid())
+  title       String
+  artist      String
+  album       String?
+  releaseDate DateTime?
+  genre       String?
+  playUrl     String?
+  coverUrl    String?
+  duration    Int?
+  copyright   String?
+  order       Int             @default(0)
+  createdAt   DateTime        @default(now())
+  playlists   PlaylistTrack[]
+}
+
+model MusicPlaylist {
+  id          String          @id @default(uuid())
+  name        String
+  description String?
+  coverUrl    String?
+  order       Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  tracks      PlaylistTrack[]
+}
+
+model PlaylistTrack {
+  id         String        @id @default(uuid())
+  playlistId String
+  trackId    String
+  order      Int           @default(0)
+  playlist   MusicPlaylist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  track      MusicTrack    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@unique([playlistId, trackId])
+}
+
+model Diary {
+  id          String         @id @default(uuid())
+  title       String
+  slug        String         @unique
+  content     String
+  excerpt     String?
+  status      String         @default("DRAFT")
+  categoryId  String?
+  coverImage  String?
+  views       Int            @default(0)
+  likes       Int            @default(0)
+  isPinned    Boolean        @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  category    DiaryCategory? @relation(fields: [categoryId], references: [id])
+  tags        DiaryTagRelation[]
+  comments    Comment[]
+  likesList   Like[]
+}
+
+model DiaryCategory {
+  id          String  @id @default(uuid())
+  name        String
+  slug        String  @unique
+  description String?
+  color       String?
+  order       Int     @default(0)
+  diaries     Diary[]
+}
+
+model DiaryTag {
+  id       String             @id @default(uuid())
+  name     String             @unique
+  color    String?
+  diaries  DiaryTagRelation[]
+}
+
+model DiaryTagRelation {
+  id      String   @id @default(uuid())
+  diaryId String
+  tagId   String
+  diary   Diary    @relation(fields: [diaryId], references: [id], onDelete: Cascade)
+  tag     DiaryTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([diaryId, tagId])
+}
+
+model Comment {
+  id            String   @id @default(uuid())
+  diaryId       String
+  parentId      String?
+  authorName    String
+  authorEmail   String
+  authorWebsite String?
+  content       String
+  status        String   @default("PENDING")
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+  diary         Diary    @relation(fields: [diaryId], references: [id], onDelete: Cascade)
+  parent        Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies       Comment[] @relation("CommentReplies")
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  diaryId   String
+  ipAddress String
+  createdAt DateTime @default(now())
+  diary     Diary    @relation(fields: [diaryId], references: [id], onDelete: Cascade)
+
+  @@unique([diaryId, ipAddress])
+}

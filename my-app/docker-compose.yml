@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    image: docker.m.daocloud.io/library/mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: myapp_db
+      MYSQL_USER: myapp_user
+      MYSQL_PASSWORD: myapp_password123
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "mysql://myapp_user:myapp_password123@db:3306/myapp_db"
+      NEXTAUTH_URL: "http://localhost:3000"
+      NEXTAUTH_SECRET: "your-production-secret-key"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: sh -c "npx prisma migrate deploy && node server.js"
+
+volumes:
+  mysql_data:
