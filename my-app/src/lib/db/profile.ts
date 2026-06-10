@@ -2,7 +2,17 @@ import { prisma } from "@/lib/prisma";
 
 export async function getProfile() {
   return prisma.profile.findFirst({
-    include: {
+    select: {
+      id: true,
+      userId: true,
+      fullName: true,
+      title: true,
+      bio: true,
+      avatar: true,
+      location: true,
+      website: true,
+      createdAt: true,
+      updatedAt: true,
       education: { orderBy: { order: "asc" } },
       experience: { orderBy: { order: "asc" } },
       skills: { orderBy: { order: "asc" } },

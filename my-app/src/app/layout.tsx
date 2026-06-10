@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import StarryBackground from "@/components/layout/StarryBackground";
+import WorldBackground from "@/components/layout/WorldBackground";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { ToastProvider } from "@/components/ui/Toast";
 
@@ -14,23 +14,23 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "个人网站 - 探索我的数字宇宙",
-    template: "%s | 个人网站",
+    default: "迷途世界 - 探索我的数字宇宙",
+    template: "%s | 迷途世界",
   },
-  description: "我的个人网站 - 展示项目、分享技术、记录生活",
-  keywords: ["个人网站", "作品集", "技术博客", "项目展示", "音乐", "日记"],
-  authors: [{ name: "个人" }],
+  description: "迷途世界 (MituWorld) - 展示项目、分享技术、记录生活",
+  keywords: ["迷途世界", "MituWorld", "作品集", "技术博客", "项目展示", "音乐", "日记"],
+  authors: [{ name: "迷途世界" }],
   openGraph: {
-    title: "个人网站 - 探索我的数字宇宙",
-    description: "我的个人网站 - 展示项目、分享技术、记录生活",
+    title: "迷途世界 - 探索我的数字宇宙",
+    description: "迷途世界 (MituWorld) - 展示项目、分享技术、记录生活",
     type: "website",
     locale: "zh_CN",
-    siteName: "个人网站",
+    siteName: "迷途世界",
   },
   twitter: {
     card: "summary_large_image",
-    title: "个人网站 - 探索我的数字宇宙",
-    description: "我的个人网站 - 展示项目、分享技术、记录生活",
+    title: "迷途世界 - 探索我的数字宇宙",
+    description: "迷途世界 (MituWorld) - 展示项目、分享技术、记录生活",
   },
   robots: {
     index: true,
@@ -48,7 +48,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-sans theme-transition">
         <ThemeProvider>
           <ToastProvider>
-            <StarryBackground />
+            <WorldBackground />
             <Header />
             <main className="flex-1 pt-16">{children}</main>
             <Footer />

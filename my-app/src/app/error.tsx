@@ -14,11 +14,11 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cosmic-dark relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center dark:bg-void-dark bg-realm-light relative overflow-hidden">
       {/* 背景装饰 */}
-      <div className="absolute inset-0 bg-cosmic-gradient opacity-50" />
+      <div className="absolute inset-0 dark:bg-void-gradient bg-realm-gradient opacity-50" />
 
-      <div className="relative text-center p-8 max-w-md glass rounded-2xl cosmic-card z-10">
+      <div className="relative text-center p-8 max-w-md glass dark:glass glass-realm rounded-2xl dark:void-card realm-card z-10">
         {/* 错误图标 - 爆炸的星球 */}
         <div className="text-6xl mb-4 relative">
           <div className="absolute inset-0 flex items-center justify-center">
@@ -26,15 +26,15 @@ export default function GlobalError({
           </div>
           <span className="relative">💥</span>
         </div>
-        <h1 className="text-2xl font-bold text-cosmic-star mb-2">
+        <h1 className="text-2xl font-bold dark:text-void-star text-realm-foreground mb-2">
           出错了
         </h1>
-        <p className="text-cosmic-dust/70 mb-6">
+        <p className="dark:text-void-dust/70 text-realm-mist/70 mb-6">
           {error.message || "发生了未知错误"}
         </p>
         <button
           onClick={reset}
-          className="btn-cosmic px-6 py-2 bg-sun-gradient text-white rounded-xl hover:shadow-sun transition-all duration-300"
+          className="dark:btn-void btn-realm px-6 py-2 bg-sun-gradient text-white rounded-xl hover:shadow-sun transition-all duration-300"
         >
           重试
         </button>

@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { authOptions, requireAdmin } from "@/lib/auth";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { getProfile, createProfile, updateProfile } from "@/lib/db/profile";
 import { profileSchema } from "@/lib/validations/profile";
 import { successResponse, errorResponse } from "@/lib/utils/api-response";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const limitResponse = rateLimitResponse(request, { maxRequests: 60 });
+  if (limitResponse) return limitResponse;
+
   try {
     const profile = await getProfile();
     if (!profile) {
@@ -25,15 +29,13 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json(
-        errorResponse("Unauthorized", "请先登录"),
-        { status: 401 }
-      );
-    }
+  const limitResponse = rateLimitResponse(request, { maxRequests: 30 });
+  if (limitResponse) return limitResponse;
 
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck) return adminCheck;
+
+  try {
     const body = await request.json();
     const result = profileSchema.safeParse(body);
 
@@ -45,9 +47,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const session = await getServerSession(authOptions);
     const profile = await createProfile({
       ...result.data,
-      userId: session.user.id,
+      userId: session?.user?.id || "",
     });
 
     return NextResponse.json(successResponse(profile, "创建成功"), {
@@ -63,15 +66,13 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json(
-        errorResponse("Unauthorized", "请先登录"),
-        { status: 401 }
-      );
-    }
+  const limitResponse = rateLimitResponse(request, { maxRequests: 30 });
+  if (limitResponse) return limitResponse;
 
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck) return adminCheck;
+
+  try {
     const { id, ...data } = await request.json();
     const result = profileSchema.partial().safeParse(data);
 

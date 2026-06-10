@@ -101,7 +101,7 @@ export function GitHubRepos() {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="text-gray-500 dark:text-gray-400">加载中...</div>
+        <div className="dark:text-void-dust/70 text-realm-mist/70">加载中...</div>
       </div>
     );
   }
@@ -110,11 +110,11 @@ export function GitHubRepos() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-2xl font-bold dark:text-void-star text-realm-foreground">
             GitHub 仓库
           </h2>
           {lastSync && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-sm dark:text-void-dust/70 text-realm-mist/70 mt-1">
               上次同步: {formatDate(lastSync.syncTime)}
               {lastSync.status === "SUCCESS" && ` (${lastSync.reposCount} 个仓库)`}
             </p>
@@ -123,7 +123,7 @@ export function GitHubRepos() {
         <button
           onClick={handleSync}
           disabled={syncing}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="theme-btn-primary inline-flex items-center px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {syncing ? (
             <>
@@ -151,13 +151,13 @@ export function GitHubRepos() {
             placeholder="搜索仓库..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+            className="w-full px-4 py-2 border dark:border-void-purple/20 border-realm-sun/20 rounded-md dark:bg-void-deeper/50 bg-white/70 dark:text-void-star text-realm-foreground focus:ring-2 focus:ring-realm-ocean dark:focus:ring-void-cyan focus:border-realm-ocean dark:focus:border-void-cyan outline-none transition-all"
           />
         </div>
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          className="px-4 py-2 border dark:border-void-purple/20 border-realm-sun/20 rounded-md dark:bg-void-deeper/50 bg-white/70 dark:text-void-star text-realm-foreground focus:ring-2 focus:ring-realm-ocean dark:focus:ring-void-cyan focus:border-realm-ocean dark:focus:border-void-cyan outline-none transition-all"
         >
           <option value="updated">按更新时间</option>
           <option value="stars">按 Stars</option>
@@ -167,7 +167,7 @@ export function GitHubRepos() {
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+            className="px-4 py-2 border dark:border-void-purple/20 border-realm-sun/20 rounded-md dark:bg-void-deeper/50 bg-white/70 dark:text-void-star text-realm-foreground focus:ring-2 focus:ring-realm-ocean dark:focus:ring-void-cyan focus:border-realm-ocean dark:focus:border-void-cyan outline-none transition-all"
           >
             <option value="">所有语言</option>
             {languages.map((lang) => (
@@ -181,13 +181,13 @@ export function GitHubRepos() {
 
       {repos.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-gray-500 dark:text-gray-400 mb-4">
+          <div className="dark:text-void-dust/70 text-realm-mist/70 mb-4">
             还没有同步任何仓库
           </div>
           <button
             onClick={handleSync}
             disabled={syncing}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+            className="theme-btn-primary inline-flex items-center px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50"
           >
             开始同步
           </button>
@@ -197,7 +197,7 @@ export function GitHubRepos() {
           {repos.map((repo) => (
             <div
               key={repo.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow"
+              className="dark:glass glass-realm rounded-lg p-6 dark:hover:shadow-glow hover:shadow-sunny transition-all duration-300"
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
@@ -205,19 +205,19 @@ export function GitHubRepos() {
                     href={repo.htmlUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-lg font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                    className="text-lg font-semibold dark:text-void-cyan text-realm-ocean hover:underline"
                   >
                     {repo.name}
                   </Link>
                   {repo.description && (
-                    <p className="text-gray-600 dark:text-gray-300 mt-2">
+                    <p className="dark:text-void-dust/80 text-realm-mist/80 mt-2">
                       {repo.description}
                     </p>
                   )}
-                  <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex flex-wrap gap-4 mt-4 text-sm dark:text-void-dust/70 text-realm-mist/70">
                     {repo.language && (
                       <span className="inline-flex items-center">
-                        <span className="w-3 h-3 rounded-full bg-blue-500 mr-1"></span>
+                        <span className="w-3 h-3 rounded-full bg-realm-ocean dark:bg-void-cyan mr-1"></span>
                         {repo.language}
                       </span>
                     )}
@@ -240,7 +240,7 @@ export function GitHubRepos() {
                       {JSON.parse(repo.topics).map((topic: string) => (
                         <span
                           key={topic}
-                          className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                          className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium dark:bg-void-purple/10 dark:text-void-star bg-realm-sky/10 text-realm-foreground"
                         >
                           {topic}
                         </span>

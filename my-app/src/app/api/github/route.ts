@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import {
   getGitHubRepos,
   syncGitHubRepo,
@@ -11,6 +11,9 @@ import {
 const GITHUB_API = "https://api.github.com";
 
 export async function GET(request: NextRequest) {
+  const limitResponse = rateLimitResponse(request, { maxRequests: 60 });
+  if (limitResponse) return limitResponse;
+
   try {
     const { searchParams } = new URL(request.url);
     const action = searchParams.get("action");
@@ -38,12 +41,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const limitResponse = rateLimitResponse(request, { maxRequests: 5, identifier: "github-sync" });
+  if (limitResponse) return limitResponse;
 
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck) return adminCheck;
+
+  try {
     const { searchParams } = new URL(request.url);
     const action = searchParams.get("action");
 

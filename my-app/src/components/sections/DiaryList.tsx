@@ -82,7 +82,7 @@ export function DiaryList() {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="text-gray-500 dark:text-gray-400">加载中...</div>
+        <div className="dark:text-void-dust/70 text-realm-mist/70">加载中...</div>
       </div>
     );
   }
@@ -97,14 +97,14 @@ export function DiaryList() {
             placeholder="搜索日记..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+            className="w-full px-4 py-2 border dark:border-void-purple/20 border-realm-sun/20 rounded-lg dark:bg-void-deeper/50 bg-white/70 dark:text-void-star text-realm-foreground focus:ring-2 focus:ring-realm-ocean dark:focus:ring-void-cyan focus:border-realm-ocean dark:focus:border-void-cyan outline-none transition-all"
           />
         </div>
         {categories.length > 0 && (
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+            className="px-4 py-2 border dark:border-void-purple/20 border-realm-sun/20 rounded-lg dark:bg-void-deeper/50 bg-white/70 dark:text-void-star text-realm-foreground focus:ring-2 focus:ring-realm-ocean dark:focus:ring-void-cyan focus:border-realm-ocean dark:focus:border-void-cyan outline-none transition-all"
           >
             <option value="">所有分类</option>
             {categories.map((category) => (
@@ -119,7 +119,7 @@ export function DiaryList() {
       {/* Diaries Grid */}
       {diaries.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-gray-500 dark:text-gray-400">暂无日记</div>
+          <div className="dark:text-void-dust/70 text-realm-mist/70">暂无日记</div>
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

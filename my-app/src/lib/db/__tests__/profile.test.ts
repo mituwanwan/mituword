@@ -8,7 +8,9 @@ import {
   addSkill,
 } from "../profile";
 
-describe("Profile Database Operations", () => {
+const describeIfDb = (globalThis as any).DB_AVAILABLE ? describe : describe.skip;
+
+describeIfDb("Profile Database Operations", () => {
   beforeEach(async () => {
     await prisma.education.deleteMany();
     await prisma.workExperience.deleteMany();

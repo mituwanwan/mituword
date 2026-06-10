@@ -10,8 +10,12 @@ export const registerSchema = z.object({
   email: z.string().email("请输入有效的邮箱地址"),
   password: z
     .string()
-    .min(6, "密码至少6个字符")
-    .max(100, "密码最多100个字符"),
+    .min(8, "密码至少8个字符")
+    .max(100, "密码最多100个字符")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+      "密码需包含大小写字母、数字和特殊字符"
+    ),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

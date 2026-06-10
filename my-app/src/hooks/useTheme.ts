@@ -1,64 +1,78 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-export type Theme = 'cosmic' | 'solar';
+export type Theme = 'void' | 'realm';
+
+const STORAGE_KEY = 'theme';
+
+function migrateLegacyTheme(saved: string | null): Theme {
+  if (saved === 'cosmic') return 'void';
+  if (saved === 'solar') return 'realm';
+  if (saved === 'void' || saved === 'realm') return saved;
+  return 'void';
+}
+
+function getSystemTheme(): Theme {
+  if (typeof window === 'undefined' || !window.matchMedia) return 'void';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'void' : 'realm';
+}
 
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>('cosmic');
-  const [isCosmic, setIsCosmic] = useState(true);
+  const [theme, setTheme] = useState<Theme>('void');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // 从 localStorage 读取主题
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-      setIsCosmic(savedTheme === 'cosmic');
-    } else {
-      // 检查系统偏好
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const initialTheme = prefersDark ? 'cosmic' : 'solar';
-      setTheme(initialTheme);
-      setIsCosmic(initialTheme === 'cosmic');
+    const savedTheme = localStorage.getItem(STORAGE_KEY);
+    const initialTheme = savedTheme ? migrateLegacyTheme(savedTheme) : getSystemTheme();
+
+    setTheme(initialTheme);
+    document.documentElement.classList.remove('dark', 'light');
+    document.documentElement.classList.add(initialTheme === 'void' ? 'dark' : 'light');
+    setMounted(true);
+
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = (e: MediaQueryListEvent) => {
+        if (!localStorage.getItem(STORAGE_KEY)) {
+          const next: Theme = e.matches ? 'void' : 'realm';
+          setTheme(next);
+          document.documentElement.classList.remove('dark', 'light');
+          document.documentElement.classList.add(next === 'void' ? 'dark' : 'light');
+        }
+      };
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
     }
-
-    // 监听 html 元素的 class 变化
-    const observer = new MutationObserver(() => {
-      const isLight = document.documentElement.classList.contains('light');
-      const currentTheme = isLight ? 'solar' : 'cosmic';
-      setTheme(currentTheme);
-      setIsCosmic(currentTheme === 'cosmic');
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-
-    return () => observer.disconnect();
   }, []);
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'cosmic' ? 'solar' : 'cosmic';
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => {
+      const next: Theme = prev === 'void' ? 'realm' : 'void';
+      const root = document.documentElement;
+
+      root.classList.remove('dark', 'light');
+      root.classList.add(next === 'void' ? 'dark' : 'light');
+      localStorage.setItem(STORAGE_KEY, next);
+
+      return next;
+    });
+  }, []);
+
+  const setThemeExplicitly = useCallback((next: Theme) => {
     const root = document.documentElement;
-
-    if (newTheme === 'cosmic') {
-      root.classList.remove('light');
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-      root.classList.add('light');
-    }
-
-    localStorage.setItem('theme', newTheme);
-    setTheme(newTheme);
-    setIsCosmic(newTheme === 'cosmic');
-  };
+    root.classList.remove('dark', 'light');
+    root.classList.add(next === 'void' ? 'dark' : 'light');
+    localStorage.setItem(STORAGE_KEY, next);
+    setTheme(next);
+  }, []);
 
   return {
     theme,
-    isCosmic,
-    isSolar: !isCosmic,
+    isVoid: theme === 'void',
+    isRealm: theme === 'realm',
     toggleTheme,
+    setTheme: setThemeExplicitly,
+    mounted,
   };
 }

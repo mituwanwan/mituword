@@ -53,9 +53,29 @@ export async function getDiaryBySlug(slug: string) {
       tags: { include: { tag: true } },
       comments: {
         where: { status: "APPROVED", parentId: null },
-        include: {
+        select: {
+          id: true,
+          diaryId: true,
+          parentId: true,
+          authorName: true,
+          authorEmail: true,
+          authorWebsite: true,
+          content: true,
+          status: true,
+          createdAt: true,
           replies: {
             where: { status: "APPROVED" },
+            select: {
+              id: true,
+              diaryId: true,
+              parentId: true,
+              authorName: true,
+              authorEmail: true,
+              authorWebsite: true,
+              content: true,
+              status: true,
+              createdAt: true,
+            },
             orderBy: { createdAt: "asc" },
           },
         },
@@ -133,5 +153,26 @@ export async function addComment(data: {
 export async function addLike(diaryId: string, ipAddress: string) {
   return prisma.like.create({
     data: { diaryId, ipAddress },
+  });
+}
+
+export async function getRelatedDiaries(
+  categoryId: string,
+  excludeId: string,
+  limit: number = 3
+) {
+  return prisma.diary.findMany({
+    where: {
+      categoryId,
+      id: { not: excludeId },
+      status: "PUBLISHED",
+    },
+    include: {
+      category: true,
+      tags: { include: { tag: true } },
+      _count: { select: { comments: true, likesList: true } },
+    },
+    orderBy: [{ isPinned: "desc" }, { publishedAt: "desc" }],
+    take: limit,
   });
 }

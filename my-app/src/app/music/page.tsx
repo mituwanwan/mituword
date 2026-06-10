@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: "聆听我的音乐收藏，探索我喜欢的歌曲和播放列表",
   keywords: ["音乐", "播放列表", "歌曲", "音乐收藏"],
   openGraph: {
-    title: "音乐收藏 - 个人网站",
+    title: "音乐收藏 - 迷途世界",
     description: "聆听我的音乐收藏，探索我喜欢的歌曲和播放列表",
     type: "website",
   },
@@ -21,13 +21,13 @@ export default async function MusicPage() {
   const playlists = await getMusicPlaylists();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+    <div className="min-h-screen py-12">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold dark:text-void-star text-realm-foreground">
             音乐
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-2">
+          <p className="dark:text-void-dust text-realm-mist mt-2">
             聆听我的音乐收藏
           </p>
         </div>

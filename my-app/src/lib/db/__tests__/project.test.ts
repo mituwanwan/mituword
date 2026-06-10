@@ -8,7 +8,9 @@ import {
   incrementProjectViews,
 } from "../project";
 
-describe("Project Database Operations", () => {
+const describeIfDb = (globalThis as any).DB_AVAILABLE ? describe : describe.skip;
+
+describeIfDb("Project Database Operations", () => {
   beforeEach(async () => {
     await prisma.projectTagRelation.deleteMany();
     await prisma.projectImage.deleteMany();

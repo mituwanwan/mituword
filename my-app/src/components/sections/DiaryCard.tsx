@@ -55,7 +55,7 @@ export function DiaryCard({ diary }: DiaryCardProps) {
   }
 
   return (
-    <article className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
+    <article className="dark:glass glass-realm rounded-lg overflow-hidden dark:hover:shadow-glow hover:shadow-sunny transition-all duration-300">
       {diary.coverImage && (
         <Link href={`/diary/${diary.slug}`}>
           <div className="relative h-48 overflow-hidden">
@@ -72,7 +72,7 @@ export function DiaryCard({ diary }: DiaryCardProps) {
       <div className="p-6">
         <div className="flex items-center gap-2 mb-3">
           {diary.isPinned && (
-            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium dark:bg-void-sun/20 dark:text-void-sun bg-realm-sunset/20 text-realm-sunset">
               <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M17 4v7l2 3v2h-6v5l-1 1-1-1v-5H5v-2l2-3V4h10z" />
               </svg>
@@ -91,15 +91,15 @@ export function DiaryCard({ diary }: DiaryCardProps) {
             </span>
           )}
         </div>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+        <h2 className="text-xl font-semibold dark:text-void-star text-realm-foreground mb-2">
           <Link
             href={`/diary/${diary.slug}`}
-            className="hover:text-blue-600 dark:hover:text-blue-400"
+            className="dark:hover:text-void-sun hover:text-realm-sunset transition-colors"
           >
             {diary.title}
           </Link>
         </h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+        <p className="dark:text-void-dust/80 text-realm-mist/80 mb-4 line-clamp-3">
           {diary.excerpt || diary.content.substring(0, 150)}
           {!diary.excerpt && diary.content.length > 150 && "..."}
         </p>
@@ -108,7 +108,7 @@ export function DiaryCard({ diary }: DiaryCardProps) {
             {diary.tags.map(({ tag }) => (
               <span
                 key={tag.id}
-                className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium dark:bg-void-purple/10 dark:text-void-star bg-realm-sky/10 text-realm-foreground"
                 style={tag.color ? { backgroundColor: tag.color, color: "white" } : undefined}
               >
                 {tag.name}
@@ -116,7 +116,7 @@ export function DiaryCard({ diary }: DiaryCardProps) {
             ))}
           </div>
         )}
-        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-between text-sm dark:text-void-dust/70 text-realm-mist/70">
           <time dateTime={diary.publishedAt || diary.createdAt}>
             {formatDate(diary.publishedAt || diary.createdAt)}
           </time>

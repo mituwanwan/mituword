@@ -213,6 +213,7 @@ model MusicTrack {
   order       Int             @default(0)
   createdAt   DateTime        @default(now())
   playlists   PlaylistTrack[]
+  dailyReports DailyReport[]
 }
 
 model MusicPlaylist {
@@ -256,6 +257,7 @@ model Diary {
   tags        DiaryTagRelation[]
   comments    Comment[]
   likesList   Like[]
+  dailyReports DailyReport[]
 }
 
 model DiaryCategory {
@@ -310,4 +312,33 @@ model Like {
   diary     Diary    @relation(fields: [diaryId], references: [id], onDelete: Cascade)
 
   @@unique([diaryId, ipAddress])
+}
+
+model SiteShare {
+  id          String        @id @default(cuid())
+  name        String
+  url         String
+  description String?
+  category    String        // 开发工具 / 设计 / 学习 / 音乐 / 游戏
+  icon        String?
+  order       Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  dailyReports DailyReport[]
+}
+
+model DailyReport {
+  id        String       @id @default(cuid())
+  date      DateTime     @unique
+  status    String       @default("DRAFT") // DRAFT / PUBLISHED
+  title     String
+  musicId   String?      // 推荐音乐
+  siteId    String?      // 推荐好站
+  diaryId   String?      // 推荐日记
+  quote     String?      // 每日一句
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  music     MusicTrack?  @relation(fields: [musicId], references: [id])
+  site      SiteShare?   @relation(fields: [siteId], references: [id])
+  diary     Diary?       @relation(fields: [diaryId], references: [id])
 }

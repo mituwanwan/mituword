@@ -56,8 +56,8 @@ function ToastContainer() {
   const typeStyles: Record<ToastType, string> = {
     success: 'bg-gradient-to-r from-emerald-600 to-green-600 border-emerald-400',
     error: 'bg-gradient-to-r from-red-600 to-rose-600 border-red-400',
-    info: 'bg-gradient-to-r from-cosmic-earth to-cyan-600 border-cosmic-cyan',
-    warning: 'bg-gradient-to-r from-cosmic-sun to-orange-600 border-cosmic-sun',
+    info: 'bg-gradient-to-r from-void-earth to-cyan-600 border-void-cyan',
+    warning: 'bg-gradient-to-r from-void-sun to-orange-600 border-void-sun',
   };
 
   const typeIcons: Record<ToastType, React.ReactNode> = {

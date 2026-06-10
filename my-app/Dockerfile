@@ -1,63 +1,51 @@
-# Multi-stage build for Next.js standalone output
-# Using Debian-based image for better compatibility with Prisma
-FROM docker.m.daocloud.io/node:20-slim AS deps
+# syntax=docker/dockerfile:1
+
+# ====== 构建阶段 ======
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install openssl for Prisma
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+# 安装依赖
+COPY package*.json ./
+RUN npm ci --only=production=false
 
-# Copy package files
-COPY package.json package-lock.json* ./
-
-# Install dependencies
-RUN npm ci
-
-FROM docker.m.daocloud.io/node:20-slim AS builder
-
-WORKDIR /app
-
-# Install openssl for Prisma
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-COPY package.json package-lock.json* ./
-
-# Copy the rest of the source code
+# 复制源码
 COPY . .
 
-# Generate Prisma client
+# 生成 Prisma Client
 RUN npx prisma generate
 
-# Build the application
+# 构建应用
 RUN npm run build
 
-FROM docker.m.daocloud.io/node:20-slim AS runner
+# ====== 生产阶段 ======
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Install openssl for Prisma
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+ENV NODE_ENV=production
+ENV PORT=3000
 
-# Create non-root user for security
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+# 安装运行时依赖
+RUN apk add --no-cache libc6-compat
 
-# Copy built application
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-# Copy prisma schema and migrations for prisma migrate deploy
-COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+# 复制构建产物
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
-# Switch to non-root user
+# 非 root 用户运行
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+RUN chown -R nextjs:nodejs /app
 USER nextjs
 
-# Expose port
 EXPOSE 3000
 
-# Start application
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
+
 CMD ["node", "server.js"]

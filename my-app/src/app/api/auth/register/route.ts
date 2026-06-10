@@ -3,8 +3,11 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/validations/auth";
 import { successResponse, errorResponse } from "@/lib/utils/api-response";
+import { rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
+  const limitResponse = rateLimitResponse(request, { maxRequests: 5, windowMs: 60 * 60 * 1000 });
+  if (limitResponse) return limitResponse;
   try {
     const body = await request.json();
 

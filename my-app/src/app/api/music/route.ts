@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
+import { rateLimitResponse } from "@/lib/rate-limit";
+import { musicTrackSchema, musicPlaylistSchema, addToPlaylistSchema } from "@/lib/validations/music";
 import {
   getMusicTracks,
   getMusicPlaylists,
@@ -15,6 +16,9 @@ import {
 } from "@/lib/db/music";
 
 export async function GET(request: NextRequest) {
+  const limitResponse = rateLimitResponse(request, { maxRequests: 60 });
+  if (limitResponse) return limitResponse;
+
   try {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type") || "tracks";
@@ -43,28 +47,57 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const limitResponse = rateLimitResponse(request, { maxRequests: 30 });
+  if (limitResponse) return limitResponse;
 
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck) return adminCheck;
+
+  try {
     const { searchParams } = new URL(request.url);
     const action = searchParams.get("action");
     const data = await request.json();
 
     if (action === "create-track") {
-      const track = await createMusicTrack(data);
+      const result = musicTrackSchema.safeParse(data);
+      if (!result.success) {
+        const issues = result.error.issues;
+        return NextResponse.json(
+          { error: "Validation failed", message: issues[0]?.message || "验证失败" },
+          { status: 400 }
+        );
+      }
+      const trackData = {
+        ...result.data,
+        releaseDate: result.data.releaseDate ? new Date(result.data.releaseDate) : undefined,
+      };
+      const track = await createMusicTrack(trackData);
       return NextResponse.json(track, { status: 201 });
     }
 
     if (action === "create-playlist") {
-      const playlist = await createMusicPlaylist(data);
+      const result = musicPlaylistSchema.safeParse(data);
+      if (!result.success) {
+        const issues = result.error.issues;
+        return NextResponse.json(
+          { error: "Validation failed", message: issues[0]?.message || "验证失败" },
+          { status: 400 }
+        );
+      }
+      const playlist = await createMusicPlaylist(result.data);
       return NextResponse.json(playlist, { status: 201 });
     }
 
     if (action === "add-to-playlist") {
-      const { playlistId, trackId, order } = data;
+      const result = addToPlaylistSchema.safeParse(data);
+      if (!result.success) {
+        const issues = result.error.issues;
+        return NextResponse.json(
+          { error: "Validation failed", message: issues[0]?.message || "验证失败" },
+          { status: 400 }
+        );
+      }
+      const { playlistId, trackId, order } = result.data;
       const playlistTrack = await addTrackToPlaylist(playlistId, trackId, order);
       return NextResponse.json(playlistTrack, { status: 201 });
     }
@@ -83,25 +116,46 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const limitResponse = rateLimitResponse(request, { maxRequests: 30 });
+  if (limitResponse) return limitResponse;
 
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck) return adminCheck;
+
+  try {
     const { searchParams } = new URL(request.url);
     const action = searchParams.get("action");
     const data = await request.json();
 
     if (action === "update-track") {
       const { id, ...updateData } = data;
-      const track = await updateMusicTrack(id, updateData);
+      const result = musicTrackSchema.partial().safeParse(updateData);
+      if (!result.success) {
+        const issues = result.error.issues;
+        return NextResponse.json(
+          { error: "Validation failed", message: issues[0]?.message || "验证失败" },
+          { status: 400 }
+        );
+      }
+      const trackData: any = { ...result.data };
+      if (result.data.releaseDate) {
+        trackData.releaseDate = new Date(result.data.releaseDate);
+      }
+      const track = await updateMusicTrack(id, trackData);
       return NextResponse.json(track);
     }
 
     if (action === "update-playlist") {
       const { id, ...updateData } = data;
-      const playlist = await updateMusicPlaylist(id, updateData);
+      const result = musicPlaylistSchema.partial().safeParse(updateData);
+      if (!result.success) {
+        const issues = result.error.issues;
+        return NextResponse.json(
+          { error: "Validation failed", message: issues[0]?.message || "验证失败" },
+          { status: 400 }
+        );
+      }
+      const playlist = await updateMusicPlaylist(id, result.data);
       return NextResponse.json(playlist);
     }
 
@@ -119,12 +173,13 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const limitResponse = rateLimitResponse(request, { maxRequests: 30 });
+  if (limitResponse) return limitResponse;
 
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck) return adminCheck;
+
+  try {
     const { searchParams } = new URL(request.url);
     const action = searchParams.get("action");
 

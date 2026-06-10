@@ -1,28 +1,18 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useTheme } from '@/hooks/useTheme';
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    // 从 localStorage 获取保存的主题
-    const savedTheme = localStorage.getItem('theme');
+  const { mounted } = useTheme();
 
-    if (savedTheme === 'solar') {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.classList.add('light');
-    } else if (savedTheme === 'cosmic') {
-      document.documentElement.classList.remove('light');
-      document.documentElement.classList.add('dark');
-    } else {
-      // 如果没有保存的主题，检查系统偏好
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (prefersDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.add('light');
-      }
-    }
-  }, []);
+  // 避免主题闪烁：在客户端挂载前不渲染内容，防止 hydration mismatch
+  if (!mounted) {
+    return (
+      <div style={{ visibility: 'hidden' }}>
+        {children}
+      </div>
+    );
+  }
 
   return <>{children}</>;
 }

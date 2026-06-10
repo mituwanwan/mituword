@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
+import { rateLimitResponse } from "@/lib/rate-limit";
+import { projectSchema } from "@/lib/validations/project";
 import {
   getProjects,
   createProject,
@@ -9,6 +10,9 @@ import {
 } from "@/lib/db/project";
 
 export async function GET(request: NextRequest) {
+  const limitResponse = rateLimitResponse(request, { maxRequests: 60 });
+  if (limitResponse) return limitResponse;
+
   try {
     const { searchParams } = new URL(request.url);
     const options = {
@@ -33,15 +37,31 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const limitResponse = rateLimitResponse(request, { maxRequests: 30 });
+  if (limitResponse) return limitResponse;
+
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck) return adminCheck;
+
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const body = await request.json();
+    const result = projectSchema.safeParse(body);
+
+    if (!result.success) {
+      const issues = result.error.issues;
+      return NextResponse.json(
+        { error: "Validation failed", message: issues[0]?.message || "验证失败" },
+        { status: 400 }
+      );
     }
 
-    const data = await request.json();
-    const project = await createProject(data);
+    const projectData = {
+      ...result.data,
+      startDate: result.data.startDate ? new Date(result.data.startDate) : undefined,
+      endDate: result.data.endDate ? new Date(result.data.endDate) : undefined,
+    };
 
+    const project = await createProject(projectData);
     return NextResponse.json(project, { status: 201 });
   } catch (error) {
     console.error("Create project error:", error);
@@ -53,15 +73,36 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  const limitResponse = rateLimitResponse(request, { maxRequests: 30 });
+  if (limitResponse) return limitResponse;
+
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck) return adminCheck;
+
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { id, ...data } = await request.json();
+    const result = projectSchema.partial().safeParse(data);
+
+    if (!result.success) {
+      const issues = result.error.issues;
+      return NextResponse.json(
+        { error: "Validation failed", message: issues[0]?.message || "验证失败" },
+        { status: 400 }
+      );
     }
 
-    const { id, ...data } = await request.json();
-    const project = await updateProject(id, data);
+    if (!id) {
+      return NextResponse.json(
+        { error: "Project ID is required" },
+        { status: 400 }
+      );
+    }
 
+    const updateData: any = { ...result.data };
+    if (result.data.startDate) updateData.startDate = new Date(result.data.startDate);
+    if (result.data.endDate) updateData.endDate = new Date(result.data.endDate);
+
+    const project = await updateProject(id, updateData);
     return NextResponse.json(project);
   } catch (error) {
     console.error("Update project error:", error);
@@ -73,12 +114,13 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const limitResponse = rateLimitResponse(request, { maxRequests: 30 });
+  if (limitResponse) return limitResponse;
 
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck) return adminCheck;
+
+  try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 

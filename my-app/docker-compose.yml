@@ -1,36 +1,68 @@
 version: '3.8'
 
 services:
-  db:
-    image: docker.m.daocloud.io/library/mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: myapp_db
-      MYSQL_USER: myapp_user
-      MYSQL_PASSWORD: myapp_password123
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-
-  web:
-    build: .
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mituworld-app
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: "mysql://myapp_user:myapp_password123@db:3306/myapp_db"
-      NEXTAUTH_URL: "http://localhost:3000"
-      NEXTAUTH_SECRET: "your-production-secret-key"
+      - NODE_ENV=production
+      - DATABASE_URL=mysql://myapp_user:myapp_password123@db:3306/myapp_db
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_USERNAME=${GITHUB_USERNAME}
     depends_on:
       db:
         condition: service_healthy
-    command: sh -c "npx prisma migrate deploy && node server.js"
+    restart: unless-stopped
+    networks:
+      - mituworld-network
+
+  db:
+    image: mysql:8.0
+    container_name: mituworld-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword123
+      - MYSQL_DATABASE=myapp_db
+      - MYSQL_USER=myapp_user
+      - MYSQL_PASSWORD=myapp_password123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./prisma/migrations:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mituworld-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: mituworld-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - mituworld-network
 
 volumes:
-  mysql_data:
+  mysql-data:
+
+networks:
+  mituworld-network:
+    driver: bridge

@@ -143,7 +143,7 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
   return (
     <div className="space-y-8">
       {/* Current Track & Player */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="dark:glass glass-realm rounded-lg shadow-lg overflow-hidden">
         <div className="p-6">
           <div className="flex flex-col md:flex-row gap-8 items-center">
             {/* Album Cover */}
@@ -157,7 +157,7 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
                   sizes="192px"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <div className="w-full h-full bg-gradient-to-br from-realm-ocean to-realm-grass dark:from-void-earth dark:to-void-purple flex items-center justify-center">
                   <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
                   </svg>
@@ -167,14 +167,14 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
 
             {/* Track Info */}
             <div className="flex-1 text-center md:text-left">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-2xl font-bold dark:text-void-star text-realm-foreground">
                 {currentTrack?.title || "选择一首歌曲"}
               </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-300 mt-1">
+              <p className="text-lg dark:text-void-dust text-realm-mist mt-1">
                 {currentTrack?.artist || "艺术家"}
               </p>
               {currentTrack?.album && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-sm dark:text-void-dust/70 text-realm-mist/70 mt-1">
                   {currentTrack.album}
                 </p>
               )}
@@ -185,7 +185,7 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
           <div className="mt-8 space-y-4">
             {/* Progress Bar */}
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-500 dark:text-gray-400 w-12 text-right">
+              <span className="text-sm dark:text-void-dust/70 text-realm-mist/70 w-12 text-right">
                 {formatTime(currentTime)}
               </span>
               <div className="flex-1">
@@ -195,10 +195,10 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
                   max={duration || 100}
                   value={currentTime}
                   onChange={handleSeek}
-                  className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                  className="w-full h-2 dark:bg-void-deeper bg-realm-sky/20 rounded-lg appearance-none cursor-pointer accent-realm-ocean dark:accent-void-cyan"
                 />
               </div>
-              <span className="text-sm text-gray-500 dark:text-gray-400 w-12">
+              <span className="text-sm dark:text-void-dust/70 text-realm-mist/70 w-12">
                 {formatTime(duration)}
               </span>
             </div>
@@ -208,16 +208,16 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
               <button
                 onClick={playPrev}
                 disabled={!currentTrack}
-                className="p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+                className="p-3 rounded-full dark:hover:bg-void-purple/10 hover:bg-realm-sky/10 disabled:opacity-50 transition-colors"
               >
-                <svg className="w-6 h-6 text-gray-700 dark:text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 dark:text-void-dust text-realm-mist" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
                 </svg>
               </button>
               <button
                 onClick={togglePlay}
                 disabled={!currentTrack?.playUrl}
-                className="p-4 rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                className="theme-btn-primary p-4 rounded-full disabled:opacity-50"
               >
                 {isPlaying ? (
                   <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -232,9 +232,9 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
               <button
                 onClick={playNext}
                 disabled={!currentTrack}
-                className="p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+                className="p-3 rounded-full dark:hover:bg-void-purple/10 hover:bg-realm-sky/10 disabled:opacity-50 transition-colors"
               >
-                <svg className="w-6 h-6 text-gray-700 dark:text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 dark:text-void-dust text-realm-mist" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
                 </svg>
               </button>
@@ -244,7 +244,7 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={() => setIsMuted(!isMuted)}
-                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                className="dark:text-void-dust/70 text-realm-mist/70 dark:hover:text-void-star hover:text-realm-foreground transition-colors"
               >
                 {isMuted || volume === 0 ? (
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -266,7 +266,7 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
                   setVolume(parseFloat(e.target.value));
                   setIsMuted(false);
                 }}
-                className="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                className="w-24 h-2 dark:bg-void-deeper bg-realm-sky/20 rounded-lg appearance-none cursor-pointer accent-realm-ocean dark:accent-void-cyan"
               />
             </div>
           </div>
@@ -276,7 +276,7 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
       {/* Playlists */}
       {playlists.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <h3 className="text-lg font-semibold dark:text-void-star text-realm-foreground mb-4">
             播放列表
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
@@ -284,19 +284,19 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
               onClick={showAllTracks}
               className={`p-4 rounded-lg border-2 text-left transition-colors ${
                 currentPlaylist === tracks
-                  ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                  : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                  ? "dark:border-void-cyan border-realm-ocean dark:bg-void-purple/10 bg-realm-sky/10"
+                  : "dark:border-void-purple/20 border-realm-sun/20 dark:hover:border-void-purple/40 hover:border-realm-sun/40"
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-realm-ocean to-realm-grass dark:from-void-earth dark:to-void-purple flex items-center justify-center">
                   <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
                   </svg>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">所有歌曲</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{tracks.length} 首</p>
+                  <p className="font-medium dark:text-void-star text-realm-foreground">所有歌曲</p>
+                  <p className="text-sm dark:text-void-dust/70 text-realm-mist/70">{tracks.length} 首</p>
                 </div>
               </div>
             </button>
@@ -306,8 +306,8 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
                 onClick={() => selectPlaylist(playlist)}
                 className={`p-4 rounded-lg border-2 text-left transition-colors ${
                   currentPlaylist.every((t, i) => t.id === playlist.tracks[i]?.track.id)
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                    ? "dark:border-void-cyan border-realm-ocean dark:bg-void-purple/10 bg-realm-sky/10"
+                    : "dark:border-void-purple/20 border-realm-sun/20 dark:hover:border-void-purple/40 hover:border-realm-sun/40"
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -321,7 +321,7 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
                         sizes="48px"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center">
+                      <div className="w-full h-full bg-gradient-to-br from-realm-grass to-realm-ocean dark:from-void-cyan dark:to-void-earth flex items-center justify-center">
                         <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M15 6H3v12h12v-1.66l2.82 1.88c.52.35 1.18-.03 1.18-.64V6.42c0-.61-.66-.99-1.18-.64L15 7.66V6z" />
                         </svg>
@@ -329,8 +329,8 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
                     )}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-white">{playlist.name}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{playlist.tracks.length} 首</p>
+                    <p className="font-medium dark:text-void-star text-realm-foreground">{playlist.name}</p>
+                    <p className="text-sm dark:text-void-dust/70 text-realm-mist/70">{playlist.tracks.length} 首</p>
                   </div>
                 </div>
               </button>
@@ -341,35 +341,35 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
 
       {/* Track List */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <h3 className="text-lg font-semibold dark:text-void-star text-realm-foreground mb-4">
           歌曲列表
         </h3>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="dark:glass glass-realm rounded-lg overflow-hidden">
           {currentPlaylist.length === 0 ? (
-            <div className="p-12 text-center text-gray-500 dark:text-gray-400">
+            <div className="p-12 text-center dark:text-void-dust/70 text-realm-mist/70">
               暂无歌曲
             </div>
           ) : (
-            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            <div className="divide-y dark:divide-void-purple/20 divide-realm-sun/20">
               {currentPlaylist.map((track, index) => (
                 <div
                   key={track.id}
                   onClick={() => playTrack(index)}
                   className={`flex items-center gap-4 p-4 cursor-pointer transition-colors ${
                     index === currentTrackIndex
-                      ? "bg-blue-50 dark:bg-blue-900/20"
-                      : "hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                      ? "dark:bg-void-purple/10 bg-realm-sky/10"
+                      : "dark:hover:bg-void-purple/5 hover:bg-realm-sky/5"
                   }`}
                 >
                   <div className="w-10 text-center">
                     {index === currentTrackIndex && isPlaying ? (
                       <div className="flex items-center justify-center gap-0.5 h-6">
-                        <span className="w-1 h-4 bg-blue-600 rounded-full animate-pulse"></span>
-                        <span className="w-1 h-6 bg-blue-600 rounded-full animate-pulse" style={{ animationDelay: "0.1s" }}></span>
-                        <span className="w-1 h-3 bg-blue-600 rounded-full animate-pulse" style={{ animationDelay: "0.2s" }}></span>
+                        <span className="w-1 h-4 bg-realm-ocean dark:bg-void-cyan rounded-full animate-pulse"></span>
+                        <span className="w-1 h-6 bg-realm-ocean dark:bg-void-cyan rounded-full animate-pulse" style={{ animationDelay: "0.1s" }}></span>
+                        <span className="w-1 h-3 bg-realm-ocean dark:bg-void-cyan rounded-full animate-pulse" style={{ animationDelay: "0.2s" }}></span>
                       </div>
                     ) : (
-                      <span className="text-gray-400 dark:text-gray-500">{index + 1}</span>
+                      <span className="dark:text-void-dust/50 text-realm-mist/50">{index + 1}</span>
                     )}
                   </div>
                   <div className="relative w-10 h-10 rounded overflow-hidden flex-shrink-0">
@@ -382,7 +382,7 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
                         sizes="40px"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
+                      <div className="w-full h-full bg-gradient-to-br from-gray-400 to-gray-600 dark:from-void-deeper dark:to-void-blue flex items-center justify-center">
                         <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
                         </svg>
@@ -392,22 +392,22 @@ export function MusicPlayer({ tracks, playlists = [] }: MusicPlayerProps) {
                   <div className="flex-1 min-w-0">
                     <p className={`font-medium truncate ${
                       index === currentTrackIndex
-                        ? "text-blue-600 dark:text-blue-400"
-                        : "text-gray-900 dark:text-white"
+                        ? "dark:text-void-cyan text-realm-ocean"
+                        : "dark:text-void-star text-realm-foreground"
                     }`}>
                       {track.title}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                    <p className="text-sm dark:text-void-dust/70 text-realm-mist/70 truncate">
                       {track.artist}
                     </p>
                   </div>
                   {track.album && (
-                    <div className="hidden sm:block text-sm text-gray-500 dark:text-gray-400 flex-1 min-w-0 truncate">
+                    <div className="hidden sm:block text-sm dark:text-void-dust/70 text-realm-mist/70 flex-1 min-w-0 truncate">
                       {track.album}
                     </div>
                   )}
                   {track.duration && (
-                    <div className="text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">
+                    <div className="text-sm dark:text-void-dust/70 text-realm-mist/70 flex-shrink-0">
                       {formatTime(track.duration)}
                     </div>
                   )}

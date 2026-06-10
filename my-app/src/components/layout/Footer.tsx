@@ -1,48 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-
-type Theme = 'cosmic' | 'solar';
+import { useTheme } from "@/hooks/useTheme";
 
 export default function Footer() {
-  const [theme, setTheme] = useState<Theme>('cosmic');
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
-
-    // 监听主题变化
-    const observer = new MutationObserver(() => {
-      const isLight = document.documentElement.classList.contains('light');
-      setTheme(isLight ? 'solar' : 'cosmic');
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-
-    return () => observer.disconnect();
-  }, []);
-
-  const isCosmic = theme === 'cosmic';
+  const { isVoid } = useTheme();
 
   return (
-    <footer className={`relative mt-20 border-t ${isCosmic ? 'border-cosmic-purple/20 glass' : 'border-solar-sun/20 glass-solar'} theme-transition`}>
+    <footer className={`relative mt-20 border-t ${isVoid ? 'border-void-purple/20 glass' : 'border-realm-sun/20 glass-realm'} theme-transition`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* 品牌信息 */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <div className="relative w-8 h-8">
-                <div className={`absolute inset-0 ${isCosmic ? 'bg-sun-gradient' : 'bg-sunrise-gradient'} rounded-full animate-pulse-glow`} />
-                <div className={`absolute inset-1 ${isCosmic ? 'bg-cosmic-dark' : 'bg-solar-light'} rounded-full`} />
+                <div className={`absolute inset-0 ${isVoid ? 'bg-sun-gradient' : 'bg-sunrise-gradient'} rounded-full animate-pulse-glow`} />
+                <div className={`absolute inset-1 ${isVoid ? 'bg-void-dark' : 'bg-realm-light'} rounded-full`} />
               </div>
-              <span className={`text-xl font-bold bg-gradient-to-r ${isCosmic ? 'from-cosmic-sun to-cosmic-sunRed' : 'from-solar-sunset to-solar-sun'} bg-clip-text text-transparent`}>
-                个人网站
+              <span className={`text-xl font-bold bg-gradient-to-r ${isVoid ? 'from-void-sun to-void-sunRed' : 'from-realm-sunset to-realm-sun'} bg-clip-text text-transparent`}>
+                迷途世界
               </span>
             </div>
-            <p className={`text-sm ${isCosmic ? 'text-cosmic-dust/70' : 'text-solar-mist/70'} max-w-md`}>
-              {isCosmic
+            <p className={`text-sm ${isVoid ? 'text-void-dust/70' : 'text-realm-mist/70'} max-w-md`}>
+              {isVoid
                 ? '探索宇宙的无限可能，记录技术的成长轨迹。在这里分享项目、文章和音乐，构建属于我的数字宇宙。'
                 : '感受阳光的温暖，记录生活的美好瞬间。在这里分享项目、文章和音乐，构建属于我的数字花园。'
               }
@@ -54,9 +34,9 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`p-2 rounded-lg transition-all duration-300 ${
-                  isCosmic
-                    ? "text-cosmic-dust/60 hover:text-cosmic-star hover:bg-cosmic-purple/20"
-                    : "text-solar-mist/60 hover:text-solar-foreground hover:bg-solar-sky/20"
+                  isVoid
+                    ? "text-void-dust/60 hover:text-void-star hover:bg-void-purple/20"
+                    : "text-realm-mist/60 hover:text-realm-foreground hover:bg-realm-sky/20"
                 }`}
                 aria-label="GitHub"
               >
@@ -67,9 +47,9 @@ export default function Footer() {
               <a
                 href="mailto:your@email.com"
                 className={`p-2 rounded-lg transition-all duration-300 ${
-                  isCosmic
-                    ? "text-cosmic-dust/60 hover:text-cosmic-star hover:bg-cosmic-purple/20"
-                    : "text-solar-mist/60 hover:text-solar-foreground hover:bg-solar-sky/20"
+                  isVoid
+                    ? "text-void-dust/60 hover:text-void-star hover:bg-void-purple/20"
+                    : "text-realm-mist/60 hover:text-realm-foreground hover:bg-realm-sky/20"
                 }`}
                 aria-label="Email"
               >
@@ -82,9 +62,9 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`p-2 rounded-lg transition-all duration-300 ${
-                  isCosmic
-                    ? "text-cosmic-dust/60 hover:text-cosmic-star hover:bg-cosmic-purple/20"
-                    : "text-solar-mist/60 hover:text-solar-foreground hover:bg-solar-sky/20"
+                  isVoid
+                    ? "text-void-dust/60 hover:text-void-star hover:bg-void-purple/20"
+                    : "text-realm-mist/60 hover:text-realm-foreground hover:bg-realm-sky/20"
                 }`}
                 aria-label="Twitter"
               >
@@ -97,7 +77,7 @@ export default function Footer() {
 
           {/* 快速链接 */}
           <div>
-            <h3 className={`text-sm font-semibold uppercase tracking-wider mb-4 ${isCosmic ? 'text-cosmic-star' : 'text-solar-foreground'}`}>
+            <h3 className={`text-sm font-semibold uppercase tracking-wider mb-4 ${isVoid ? 'text-void-star' : 'text-realm-foreground'}`}>
               快速链接
             </h3>
             <ul className="space-y-3">
@@ -105,9 +85,9 @@ export default function Footer() {
                 <Link
                   href="/about"
                   className={`text-sm transition-colors duration-300 ${
-                    isCosmic
-                      ? "text-cosmic-dust/70 hover:text-cosmic-sun"
-                      : "text-solar-mist/70 hover:text-solar-sunset"
+                    isVoid
+                      ? "text-void-dust/70 hover:text-void-sun"
+                      : "text-realm-mist/70 hover:text-realm-sunset"
                   }`}
                 >
                   关于我
@@ -117,9 +97,9 @@ export default function Footer() {
                 <Link
                   href="/projects"
                   className={`text-sm transition-colors duration-300 ${
-                    isCosmic
-                      ? "text-cosmic-dust/70 hover:text-cosmic-sun"
-                      : "text-solar-mist/70 hover:text-solar-sunset"
+                    isVoid
+                      ? "text-void-dust/70 hover:text-void-sun"
+                      : "text-realm-mist/70 hover:text-realm-sunset"
                   }`}
                 >
                   项目展示
@@ -129,9 +109,9 @@ export default function Footer() {
                 <Link
                   href="/diary"
                   className={`text-sm transition-colors duration-300 ${
-                    isCosmic
-                      ? "text-cosmic-dust/70 hover:text-cosmic-sun"
-                      : "text-solar-mist/70 hover:text-solar-sunset"
+                    isVoid
+                      ? "text-void-dust/70 hover:text-void-sun"
+                      : "text-realm-mist/70 hover:text-realm-sunset"
                   }`}
                 >
                   日记分享
@@ -141,9 +121,9 @@ export default function Footer() {
                 <Link
                   href="/music"
                   className={`text-sm transition-colors duration-300 ${
-                    isCosmic
-                      ? "text-cosmic-dust/70 hover:text-cosmic-sun"
-                      : "text-solar-mist/70 hover:text-solar-sunset"
+                    isVoid
+                      ? "text-void-dust/70 hover:text-void-sun"
+                      : "text-realm-mist/70 hover:text-realm-sunset"
                   }`}
                 >
                   音乐空间
@@ -154,10 +134,10 @@ export default function Footer() {
 
           {/* 联系信息 */}
           <div>
-            <h3 className={`text-sm font-semibold uppercase tracking-wider mb-4 ${isCosmic ? 'text-cosmic-star' : 'text-solar-foreground'}`}>
+            <h3 className={`text-sm font-semibold uppercase tracking-wider mb-4 ${isVoid ? 'text-void-star' : 'text-realm-foreground'}`}>
               联系方式
             </h3>
-            <ul className={`space-y-3 text-sm ${isCosmic ? 'text-cosmic-dust/70' : 'text-solar-mist/70'}`}>
+            <ul className={`space-y-3 text-sm ${isVoid ? 'text-void-dust/70' : 'text-realm-mist/70'}`}>
               <li className="flex items-center space-x-2">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -172,7 +152,7 @@ export default function Footer() {
                   href="https://github.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`transition-colors duration-300 ${isCosmic ? 'hover:text-cosmic-sun' : 'hover:text-solar-sunset'}`}
+                  className={`transition-colors duration-300 ${isVoid ? 'hover:text-void-sun' : 'hover:text-realm-sunset'}`}
                 >
                   GitHub
                 </a>
@@ -182,9 +162,9 @@ export default function Footer() {
         </div>
 
         {/* 版权信息 */}
-        <div className={`mt-12 pt-8 border-t ${isCosmic ? 'border-cosmic-purple/20' : 'border-solar-sun/20'}`}>
-          <p className={`text-sm text-center ${isCosmic ? 'text-cosmic-dust/50' : 'text-solar-mist/50'}`}>
-            &copy; {new Date().getFullYear()} 个人网站 · {isCosmic ? '在宇宙中留下我的痕迹' : '在阳光下记录美好时光'}
+        <div className={`mt-12 pt-8 border-t ${isVoid ? 'border-void-purple/20' : 'border-realm-sun/20'}`}>
+          <p className={`text-sm text-center ${isVoid ? 'text-void-dust/50' : 'text-realm-mist/50'}`}>
+            &copy; {new Date().getFullYear()} 迷途世界 · {isVoid ? '在宇宙中留下我的痕迹' : '在阳光下记录美好时光'}
           </p>
         </div>
       </div>
